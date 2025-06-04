@@ -6,6 +6,7 @@ import {
 	INodeListSearchResult,
 	INodeType,
 	INodeTypeDescription,
+	NodeConnectionType,
 	NodeExecutionWithMetadata,
 } from 'n8n-workflow';
 import emojis from './data/emojis.json';
@@ -27,8 +28,8 @@ export class Ntfy implements INodeType {
 		defaults: {
 			name: 'NTFY',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		properties: [...mainFields, ...generalFields, ...additionalFields, ...jsonFields],
 		credentials: [
 			{
