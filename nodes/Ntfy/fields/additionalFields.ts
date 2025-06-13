@@ -26,13 +26,14 @@ export const additionalFields: INodeProperties[] = [
 					{
 						displayName: 'Action',
 						name: 'actionButtons',
+						// eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
 						values: [
 							{
-						displayName: 'Action',
-						name: 'action',
-						type: 'options',
-						default: 'view',
-						options: [
+								displayName: 'Action',
+								name: 'action',
+								type: 'options',
+								default: 'view',
+								options: [
 									{
 										name: 'View',
 										value: 'view',
@@ -41,41 +42,32 @@ export const additionalFields: INodeProperties[] = [
 										name: 'HTTP',
 										value: 'http',
 									},
-								]
+								],
 							},
 							{
-						displayName: 'Body',
-						name: 'bodyJson',
-						description: 'JSON object to send as body',
-						type: 'json',
-						default: '',
+								displayName: 'Clear',
+								name: 'clear',
+								description: 'Whether to clear the notification when the action button is clicked',
+								type: 'boolean',
+								default: false,
 							},
 							{
-						displayName: 'Clear',
-						name: 'clear',
-						description: 'Whether to clear the notfication after action button is pressed',
-						type: 'boolean',
-						default: false,
+								displayName: 'Label',
+								name: 'label',
+								type: 'string',
+								default: '',
 							},
 							{
-						displayName: 'Headers',
-						name: 'headersJson',
-						description: 'JSON object of headers to send',
-						type: 'json',
-						default: '',
-							},
-							{
-						displayName: 'Label',
-						name: 'label',
-						type: 'string',
-						default: '',
-							},
-							{
-						displayName: 'Method',
-						name: 'method',
-						type: 'options',
-						default: 'POST',
-						options: [
+								displayName: 'Method',
+								name: 'method',
+								type: 'options',
+								default: 'POST',
+								displayOptions: {
+									show: {
+										action: ['http'],
+									},
+								},
+								options: [
 									{
 										name: 'GET',
 										value: 'GET',
@@ -92,29 +84,68 @@ export const additionalFields: INodeProperties[] = [
 										name: 'DELETE',
 										value: 'DELETE',
 									},
-					]
+								],
 							},
 							{
-						displayName: 'Send Body',
-						name: 'sendBody',
-						type: 'boolean',
-						default: false,
+								displayName: 'URL',
+								name: 'url',
+								description:
+									'URL to open when the action button is clicked. Refer to the <a href="https://docs.ntfy.sh/publish/#click-action">NTFY Docs</a> for valid URLs.',
+								type: 'string',
+								default: '',
+								placeholder: 'https://example.com',
 							},
 							{
-						displayName: 'Send Headers',
-						name: 'sendHeaders',
-						type: 'boolean',
-						default: false,
+								displayName: 'Send Body',
+								name: 'sendbody',
+								description:
+									'Whether to send a custom body with the request made with the action button',
+								type: 'boolean',
+								default: false,
+								displayOptions: {
+									show: {
+										action: ['http'],
+									},
+								},
 							},
 							{
-						displayName: 'URL',
-						name: 'url',
-						description: 'URL to open when the action button is clicked. Refer to the <a href="https://docs.ntfy.sh/publish/#click-action">NTFY Docs</a>	for valid URLs.',
-						type: 'string',
-						default: '',
-						placeholder: 'https://example.com',
+								displayName: 'Body',
+								name: 'bodyJson',
+								type: 'json',
+								default: '',
+								displayOptions: {
+									show: {
+										action: ['http'],
+										sendbody: [true],
+									},
+								},
 							},
-					],
+							{
+								displayName: 'Send Headers',
+								name: 'sendheaders',
+								description:
+									'Whether to send custom headers with the request made with the action button',
+								type: 'boolean',
+								default: false,
+								displayOptions: {
+									show: {
+										action: ['http'],
+									},
+								},
+							},
+							{
+								displayName: 'Headers',
+								name: 'headersJson',
+								type: 'json',
+								default: '',
+								displayOptions: {
+									show: {
+										action: ['http'],
+										sendheaders: [true],
+									},
+								},
+							},
+						],
 					},
 				],
 			},
