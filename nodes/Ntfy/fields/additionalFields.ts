@@ -201,6 +201,14 @@ export const additionalFields: INodeProperties[] = [
 				placeholder: 'https://example.com/icon.png',
 			},
 			{
+				displayName: 'Markdown',
+				name: 'markdown',
+				description:
+					'Whether to use Markdown formatting within the message of the notification. Refer to the <a href="https://docs.ntfy.sh/publish/#markdown-formatting">NTFY Docs</a> for more information.',
+				type: 'boolean',
+				default: false,
+			},
+			{
 				displayName: 'Scheduled Delivery',
 				name: 'delay',
 				description:
