@@ -73,6 +73,7 @@ export class Ntfy implements INodeType {
 					'actions',
 					'click',
 					'icon',
+					'markdown',
 					'delay',
 					'manualJson',
 					'fileAttachment',
