@@ -97,7 +97,7 @@ export const additionalFields: INodeProperties[] = [
 							},
 							{
 								displayName: 'Send Body',
-								name: 'sendbody',
+								name: 'sendBody',
 								description:
 									'Whether to send a custom body with the request made with the action button',
 								type: 'boolean',
@@ -116,13 +116,13 @@ export const additionalFields: INodeProperties[] = [
 								displayOptions: {
 									show: {
 										action: ['http'],
-										sendbody: [true],
+										sendBody: [true],
 									},
 								},
 							},
 							{
 								displayName: 'Send Headers',
-								name: 'sendheaders',
+								name: 'sendHeaders',
 								description:
 									'Whether to send custom headers with the request made with the action button',
 								type: 'boolean',
@@ -141,7 +141,7 @@ export const additionalFields: INodeProperties[] = [
 								displayOptions: {
 									show: {
 										action: ['http'],
-										sendheaders: [true],
+										sendHeaders: [true],
 									},
 								},
 							},

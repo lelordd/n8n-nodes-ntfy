@@ -26,6 +26,8 @@ type N8NActionButtons = {
 		url: string;
 		clear: boolean;
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+		sendBody: boolean;
+		sendHeaders: boolean;
 		headersJson: string;
 		bodyJson: string;
 	}[];
@@ -94,13 +96,13 @@ function getTagsFromNodeParameter(this: IExecuteFunctions, emojisAndTags: Emojis
 
 function getActionButtonsFromNodeParameter(actionButtons: N8NActionButtons): NTFYActionButton[] {
 	return actionButtons.actionButtons.map(
-		({ action, label, url, clear, method, headersJson, bodyJson }) => {
+		({ action, label, url, clear, method, sendBody, sendHeaders, headersJson, bodyJson }) => {
 			const button: NTFYActionButton = { action, label, url, clear };
 
 			if (action === 'http') {
 				button.method = method;
-				button.headers = JSON.parse(headersJson);
-				button.body = bodyJson;
+				if (sendHeaders) button.headers = JSON.parse(headersJson);
+				if (sendBody) button.body = bodyJson;
 			}
 
 			return button;
