@@ -49,42 +49,32 @@ export const generalFields: INodeProperties[] = [
 	{
 		displayName: 'Emojis/Tags',
 		name: 'tags',
-		description: 'View the full list of emojis <a href="https://docs.ntfy.sh/emojis">here</a>',
-		type: 'fixedCollection',
-		default: {},
+		type: 'collection',
 		placeholder: 'Add Emoji/Tag',
-		typeOptions: {
-			multipleValues: true,
-		},
+		default: {},
 		options: [
 			{
-				displayName: '',
-				name: 'emojisAndTags',
-				values: [
-					{
-						displayName: 'Emoji/Tag',
-						name: 'tag',
-						type: 'resourceLocator',
-						default: '',
-						modes: [
-							{
-								displayName: 'String',
-								name: 'string',
-								type: 'string',
-							},
-							{
-								displayName: 'Emoji',
-								name: 'list',
-								type: 'list',
-								typeOptions: {
-									searchListMethod: 'searchEmojis',
-									searchable: true,
-								},
-							},
-						],
-						noDataExpression: true,
-					},
-				],
+				// eslint-disable-next-line n8n-nodes-base/node-param-display-name-wrong-for-dynamic-multi-options
+				displayName: 'Emojis',
+				name: 'emojis',
+				type: 'multiOptions',
+				// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-dynamic-multi-options
+				description:
+					'Choose from the list of emojis below. View the full list of available emojis on the <a href="https://docs.ntfy.sh/emojis">ntfy docs</a>.',
+				typeOptions: {
+					loadOptionsMethod: 'getEmojis',
+				},
+				default: [],
+				requiresDataPath: 'multiple',
+			},
+			{
+				displayName: 'Custom Tags',
+				name: 'customTags',
+				description:
+					'If your tag is not a valid emoji, you can add your tag here. Separate tags by using commas. EX: tag1,tag2,tag3',
+				type: 'string',
+				default: '',
+				validateType: 'string',
 			},
 		],
 		displayOptions: {

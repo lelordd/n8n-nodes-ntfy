@@ -1,7 +1,7 @@
 import {
 	IExecuteFunctions,
 	IHttpRequestOptions,
-	INodeParameterResourceLocator,
+	NodeOperationError,
 	NodeParameterValueType,
 } from 'n8n-workflow';
 
@@ -11,9 +11,8 @@ type NTFYRequestData = {
 };
 
 type EmojisAndTags = {
-	emojisAndTags: {
-		tag: INodeParameterResourceLocator;
-	}[];
+	emojis: string[];
+	customTags: string;
 };
 
 type AdditionalOptions = {
@@ -69,8 +68,28 @@ function getValueFromNodeParameter(
 	}
 }
 
-function getTagsFromNodeParameter(emojisAndTags: EmojisAndTags): string[] {
-	return emojisAndTags.emojisAndTags.map(({ tag }) => tag.value) as string[];
+function getTagsFromNodeParameter(this: IExecuteFunctions, emojisAndTags: EmojisAndTags): string[] {
+	const { emojis, customTags: customTagsInput } = emojisAndTags;
+	let customTags: string[] = [];
+
+	if (customTagsInput) {
+		const tagRegex = /^[a-zA-Z-0-9_-]+$/;
+		customTags = customTagsInput
+			.split(',')
+			.map((tag) => tag.trim())
+			.filter((tag) => tag.length > 0);
+
+		const invalidTags = customTags.filter((tag) => !tagRegex.test(tag));
+
+		if (invalidTags.length > 0) {
+			throw new NodeOperationError(
+				this.getNode(),
+				`Invalid tag format: "${invalidTags.join(', ')}". Use only letters, numbers, hyphens, and underscores.`,
+			);
+		}
+	}
+
+	return [...emojis, ...customTags];
 }
 
 function getActionButtonsFromNodeParameter(actionButtons: N8NActionButtons): NTFYActionButton[] {
@@ -105,8 +124,8 @@ export async function constructRequestData(
 		if (value) {
 			switch (field) {
 				case 'tags':
-					if ((value as EmojisAndTags).emojisAndTags) {
-						requestData.body[field] = getTagsFromNodeParameter(value as EmojisAndTags);
+					if ((value as EmojisAndTags).emojis || (value as EmojisAndTags).customTags) {
+						requestData.body[field] = getTagsFromNodeParameter.call(this, value as EmojisAndTags);
 					}
 					break;
 				case 'actions':

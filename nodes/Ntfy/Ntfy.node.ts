@@ -3,7 +3,7 @@ import {
 	IExecuteFunctions,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
-	INodeListSearchResult,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
@@ -34,27 +34,22 @@ export class Ntfy implements INodeType {
 		credentials: [
 			{
 				name: 'ntfyApi',
+				required: false,
 			},
 		],
 	};
 
 	methods = {
-		listSearch: {
-			async searchEmojis(
-				this: ILoadOptionsFunctions,
-				query?: string,
-			): Promise<INodeListSearchResult> {
-				return {
-					results: emojis
-						.filter((emoji) => emoji.text.toLowerCase().includes(query?.toLowerCase() || ''))
-						.map((emoji) => ({
-							name: `${emoji.emoji} - ${emoji.text}`,
-							value: emoji.text,
-						})),
-				};
+		loadOptions: {
+			async getEmojis(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return emojis.map((emoji) => ({
+					name: `${emoji.emoji} - ${emoji.text}`,
+					value: emoji.text,
+				}));
 			},
 		},
 	};
+
 	async execute(
 		this: IExecuteFunctions,
 	): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
