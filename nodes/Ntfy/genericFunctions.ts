@@ -1,19 +1,18 @@
 import {
 	IExecuteFunctions,
 	IHttpRequestOptions,
-	INodeParameterResourceLocator,
+	NodeOperationError,
 	NodeParameterValueType,
 } from 'n8n-workflow';
 
 type NTFYRequestData = {
 	headers?: { [key: string]: string };
-	body?: { [key: string]: string | string[] | NTFYActionButton[] | Buffer | undefined };
+	body: { [key: string]: string | string[] | NTFYActionButton[] | Buffer | undefined };
 };
 
 type EmojisAndTags = {
-	emojisAndTags: {
-		tag: INodeParameterResourceLocator;
-	}[];
+	emojis: string[];
+	customTags: string;
 };
 
 type AdditionalOptions = {
@@ -27,6 +26,8 @@ type N8NActionButtons = {
 		url: string;
 		clear: boolean;
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+		sendBody: boolean;
+		sendHeaders: boolean;
 		headersJson: string;
 		bodyJson: string;
 	}[];
@@ -69,19 +70,39 @@ function getValueFromNodeParameter(
 	}
 }
 
-function getTagsFromNodeParameter(emojisAndTags: EmojisAndTags): string[] {
-	return emojisAndTags.emojisAndTags.map(({ tag }) => tag.value) as string[];
+function getTagsFromNodeParameter(this: IExecuteFunctions, emojisAndTags: EmojisAndTags): string[] {
+	const { emojis, customTags: customTagsInput } = emojisAndTags;
+	let customTags: string[] = [];
+
+	if (customTagsInput) {
+		const tagRegex = /^[a-zA-Z-0-9_-]+$/;
+		customTags = customTagsInput
+			.split(',')
+			.map((tag) => tag.trim())
+			.filter((tag) => tag.length > 0);
+
+		const invalidTags = customTags.filter((tag) => !tagRegex.test(tag));
+
+		if (invalidTags.length > 0) {
+			throw new NodeOperationError(
+				this.getNode(),
+				`Invalid tag format: "${invalidTags.join(', ')}". Use only letters, numbers, hyphens, and underscores.`,
+			);
+		}
+	}
+
+	return [...emojis, ...customTags];
 }
 
 function getActionButtonsFromNodeParameter(actionButtons: N8NActionButtons): NTFYActionButton[] {
 	return actionButtons.actionButtons.map(
-		({ action, label, url, clear, method, headersJson, bodyJson }) => {
+		({ action, label, url, clear, method, sendBody, sendHeaders, headersJson, bodyJson }) => {
 			const button: NTFYActionButton = { action, label, url, clear };
 
 			if (action === 'http') {
 				button.method = method;
-				button.headers = JSON.parse(headersJson);
-				button.body = bodyJson;
+				if (sendHeaders) button.headers = JSON.parse(headersJson);
+				if (sendBody) button.body = bodyJson;
 			}
 
 			return button;
@@ -105,20 +126,20 @@ export async function constructRequestData(
 		if (value) {
 			switch (field) {
 				case 'tags':
-					if ((value as EmojisAndTags).emojisAndTags) {
-						requestData.body![field] = getTagsFromNodeParameter(value as EmojisAndTags);
+					if ((value as EmojisAndTags).emojis || (value as EmojisAndTags).customTags) {
+						requestData.body[field] = getTagsFromNodeParameter.call(this, value as EmojisAndTags);
 					}
 					break;
 				case 'actions':
 					if ((value as N8NActionButtons).actionButtons) {
-						requestData.body![field] = getActionButtonsFromNodeParameter(value as N8NActionButtons);
+						requestData.body[field] = getActionButtonsFromNodeParameter(value as N8NActionButtons);
 					}
 					break;
 				case 'attach':
 					if ((value as N8NAttachment).attachment) {
 						const { filename, url } = (value as N8NAttachment).attachment;
-						requestData.body!.attach = url;
-						if (filename) requestData.body!.filename = filename;
+						requestData.body.attach = url;
+						if (filename) requestData.body.filename = filename;
 					}
 					break;
 				case 'manualJson':
@@ -130,7 +151,7 @@ export async function constructRequestData(
 					};
 					break;
 				default:
-					requestData.body![field] = value as string;
+					requestData.body[field] = value as string;
 			}
 		}
 	}
@@ -156,7 +177,7 @@ export async function requestNTFYApi(
 		json: constructNotification === 'jsonAndBinaryFields' ? true : undefined,
 		headers: constructNotification === 'jsonAndBinaryFields' ? requestData.headers : {},
 		body:
-			constructNotification === 'jsonAndBinaryFields' ? requestData.body?.buffer : requestData.body,
+			constructNotification === 'jsonAndBinaryFields' ? requestData.body.buffer : requestData.body,
 	};
 
 	try {

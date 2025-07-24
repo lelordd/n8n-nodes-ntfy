@@ -3,9 +3,10 @@ import {
 	IExecuteFunctions,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
-	INodeListSearchResult,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
+	NodeConnectionType,
 	NodeExecutionWithMetadata,
 } from 'n8n-workflow';
 import emojis from './data/emojis.json';
@@ -27,33 +28,28 @@ export class Ntfy implements INodeType {
 		defaults: {
 			name: 'NTFY',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		properties: [...mainFields, ...generalFields, ...additionalFields, ...jsonFields],
 		credentials: [
 			{
 				name: 'ntfyApi',
+				required: false,
 			},
 		],
 	};
 
 	methods = {
-		listSearch: {
-			async searchEmojis(
-				this: ILoadOptionsFunctions,
-				query?: string,
-			): Promise<INodeListSearchResult> {
-				return {
-					results: emojis
-						.filter((emoji) => emoji.text.toLowerCase().includes(query?.toLowerCase() || ''))
-						.map((emoji) => ({
-							name: `${emoji.emoji} - ${emoji.text}`,
-							value: emoji.text,
-						})),
-				};
+		loadOptions: {
+			async getEmojis(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return emojis.map((emoji) => ({
+					name: `${emoji.emoji} - ${emoji.text}`,
+					value: emoji.text,
+				}));
 			},
 		},
 	};
+
 	async execute(
 		this: IExecuteFunctions,
 	): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
@@ -72,6 +68,7 @@ export class Ntfy implements INodeType {
 					'actions',
 					'click',
 					'icon',
+					'markdown',
 					'delay',
 					'manualJson',
 					'fileAttachment',

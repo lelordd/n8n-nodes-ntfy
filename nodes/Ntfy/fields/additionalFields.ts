@@ -26,6 +26,7 @@ export const additionalFields: INodeProperties[] = [
 					{
 						displayName: 'Action',
 						name: 'actionButtons',
+						// eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
 						values: [
 							{
 								displayName: 'Action',
@@ -44,26 +45,17 @@ export const additionalFields: INodeProperties[] = [
 								],
 							},
 							{
+								displayName: 'Clear',
+								name: 'clear',
+								description: 'Whether to clear the notification when the action button is clicked',
+								type: 'boolean',
+								default: false,
+							},
+							{
 								displayName: 'Label',
 								name: 'label',
 								type: 'string',
 								default: '',
-							},
-							{
-								displayName: 'URL',
-								name: 'url',
-								description:
-									'URL to open when the action button is clicked. Refer to the <a href="https://docs.ntfy.sh/publish/#click-action">NTFY Docs</a> for valid URLs.',
-								type: 'string',
-								default: '',
-								placeholder: 'https://example.com',
-							},
-							{
-								displayName: 'Clear',
-								name: 'clear',
-								description: 'Whether to clear the notfication after action button is pressed',
-								type: 'boolean',
-								default: false,
 							},
 							{
 								displayName: 'Method',
@@ -94,33 +86,20 @@ export const additionalFields: INodeProperties[] = [
 									},
 								],
 							},
-							// TODO: Header and body parameters by name/value fixedCollection
 							{
-								displayName: 'Send Headers',
-								name: 'sendHeaders',
-								type: 'boolean',
-								default: false,
-								displayOptions: {
-									show: {
-										action: ['http'],
-									},
-								},
-							},
-							{
-								displayName: 'Headers',
-								name: 'headersJson',
-								description: 'JSON object of headers to send',
-								type: 'json',
+								displayName: 'URL',
+								name: 'url',
+								description:
+									'URL to open when the action button is clicked. Refer to the <a href="https://docs.ntfy.sh/publish/#click-action">NTFY Docs</a> for valid URLs.',
+								type: 'string',
 								default: '',
-								displayOptions: {
-									show: {
-										sendHeaders: [true],
-									},
-								},
+								placeholder: 'https://example.com',
 							},
 							{
 								displayName: 'Send Body',
 								name: 'sendBody',
+								description:
+									'Whether to send a custom body with the request made with the action button',
 								type: 'boolean',
 								default: false,
 								displayOptions: {
@@ -132,12 +111,37 @@ export const additionalFields: INodeProperties[] = [
 							{
 								displayName: 'Body',
 								name: 'bodyJson',
-								description: 'JSON object to send as body',
 								type: 'json',
 								default: '',
 								displayOptions: {
 									show: {
+										action: ['http'],
 										sendBody: [true],
+									},
+								},
+							},
+							{
+								displayName: 'Send Headers',
+								name: 'sendHeaders',
+								description:
+									'Whether to send custom headers with the request made with the action button',
+								type: 'boolean',
+								default: false,
+								displayOptions: {
+									show: {
+										action: ['http'],
+									},
+								},
+							},
+							{
+								displayName: 'Headers',
+								name: 'headersJson',
+								type: 'json',
+								default: '',
+								displayOptions: {
+									show: {
+										action: ['http'],
+										sendHeaders: [true],
 									},
 								},
 							},
@@ -195,6 +199,14 @@ export const additionalFields: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				placeholder: 'https://example.com/icon.png',
+			},
+			{
+				displayName: 'Markdown',
+				name: 'markdown',
+				description:
+					'Whether to use Markdown formatting within the message of the notification. Refer to the <a href="https://docs.ntfy.sh/publish/#markdown-formatting">NTFY Docs</a> for more information.',
+				type: 'boolean',
+				default: false,
 			},
 			{
 				displayName: 'Scheduled Delivery',
